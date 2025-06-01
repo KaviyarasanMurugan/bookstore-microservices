@@ -1,0 +1,34 @@
+package com.example.orderservice.service;
+
+import com.example.orderservice.entity.Order;
+import com.example.orderservice.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+    private final OrderRepository orderRepository;
+
+    public Order placeOrder(String userId, String bookId, int quantity) {
+        Order order = Order.builder()
+                .userId(userId)
+                .bookId(bookId)
+                .quantity(quantity)
+                .status("PLACED")
+                .orderDate(LocalDateTime.now())
+                .build();
+        return orderRepository.save(order);
+    }
+
+    public List<Order> getUserOrders(String userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+}
