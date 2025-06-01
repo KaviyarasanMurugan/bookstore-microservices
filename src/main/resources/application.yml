@@ -20,8 +20,33 @@ spring:
     host: rabbitmq
     port: 5672
 
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      routes:
+        - id: book-service
+          uri: lb://book-service
+          predicates:
+            - Path=/books/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/orders/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
+
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server:8761/eureka
+      defaultZone: http://localhost:8761/eureka
+
 
