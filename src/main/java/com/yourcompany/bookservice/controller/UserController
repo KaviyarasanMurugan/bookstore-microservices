@@ -1,0 +1,34 @@
+package com.yourcompany.userservice.controller;
+
+import com.yourcompany.userservice.entity.User;
+import com.yourcompany.userservice.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/users")
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService userService;
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody Map<String, String> req) {
+        User user = userService.registerUser(req.get("username"), req.get("password"));
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> req) {
+        String token = userService.loginUser(req.get("username"), req.get("password"));
+        return ResponseEntity.ok(Map.of("token", token));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> profile() {
+        // This endpoint requires auth, return dummy message or username from security context
+        return ResponseEntity.ok(Map.of("message", "You are authenticated"));
+    }
+}
