@@ -1,0 +1,38 @@
+package com.example.orderservice.controller;
+
+import com.example.orderservice.entity.Order;
+import com.example.orderservice.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/orders")
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderService orderService;
+
+    @PostMapping
+    public ResponseEntity<Order> placeOrder(@RequestBody Map<String, Object> request) {
+        Order order = orderService.placeOrder(
+                (String) request.get("userId"),
+                (String) request.get("bookId"),
+                (int) request.get("quantity")
+        );
+        return ResponseEntity.ok(order);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getOrdersByUser(@PathVariable String userId) {
+        return ResponseEntity.ok(orderService.getUserOrders(userId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Order>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+}
