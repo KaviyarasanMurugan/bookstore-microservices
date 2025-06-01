@@ -1,0 +1,40 @@
+package com.yourcompany.userservice.service;
+
+import com.yourcompany.userservice.entity.User;
+import com.yourcompany.userservice.repository.UserRepository;
+import com.yourcompany.userservice.security.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public User registerUser(String username, String password) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new RuntimeException("Username already exists");
+        }
+        User user = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .roles(new HashSet<>(Set.of("ROLE_USER")))
+                .build();
+        return userRepository.save(user);
+    }
+
+    public String loginUser(String username, String password) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid username or password");
+        }
+        return jwtUtil.generateToken(user.getUsername(), user.getRoles());
+    }
+}
